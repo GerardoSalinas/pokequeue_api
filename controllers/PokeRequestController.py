@@ -7,6 +7,7 @@ from utils.database import execute_query_json
 from utils.AQueue import AQueue
 from utils.ABlob import ABlob
 
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -53,9 +54,9 @@ async def select_pokemon_request(id : int) -> dict:
     except Exception as e:
         logger.error(f"Error updating request {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
-    
 
-async def get_all_request() -> dict:
+
+async def get_all_requests() -> dict:
     query = """
         select 
             r.id as ReportId
@@ -75,3 +76,29 @@ async def get_all_request() -> dict:
         id = record['ReportId']
         record['url'] = f"{record['url']}?{blob.generate_sas(id)}"
     return result_dict
+
+async def delete_pokemon_report(id: int):
+    try:
+        blob = ABlob()
+        result = blob.delete_blob(id)
+        if result:
+            logger.info(f'reporte con id {id} eliminado')
+            await delete_pokemon_request(id)
+        else:
+            logger.error(f"Error, el reporte {id} no existe")
+        return {"deleted": result}
+    except Exception as e:
+        logger.error(f"Error deleting report {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+async def delete_pokemon_request(id: int):
+    try:
+        query  = "EXEC pokequeue.delete_requests ?"
+        params = (id,)
+        result = await execute_query_json(query, params, True)
+        result_dict = json.loads(result)
+
+        return result_dict
+    except Exception as e:
+        logger.error(f"Error deleting request {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")

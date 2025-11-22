@@ -9,8 +9,27 @@ az acr login --name acrpokequeuedev2025
 
 # tags
 docker tag pokeapi:latest acrpokequeuedev2025.azurecr.io/pokeapi:latest
-docker tag pokeapi:latest acrpokequeuedev2025.azurecr.io/pokeapi:0.2.0
+docker tag pokeapi:latest acrpokequeuedev2025.azurecr.io/pokeapi:0.3.0
 
 # push 
 docker push acrpokequeuedev2025.azurecr.io/pokeapi:latest
-docker push acrpokequeuedev2025.azurecr.io/pokeapi:0.2.0 
+docker push acrpokequeuedev2025.azurecr.io/pokeapi:0.3.0 
+
+# ui
+
+# build
+docker build --platform linux/amd64 -t pokeui:latest . --load
+
+# run container
+docker run -d -p 9000:9000 --name pokeui-container --env-file .env pokeui:latest
+
+# release
+az acr login --name acrpokequeuedev2025
+
+# tags
+docker tag pokeui:latest acrpokequeuedev2025.azurecr.io/pokeui:latest
+docker tag pokeui:latest acrpokequeuedev2025.azurecr.io/pokeui:0.1.0
+
+# push 
+docker push acrpokequeuedev2025.azurecr.io/pokeui:latest
+docker push acrpokequeuedev2025.azurecr.io/pokeui:0.1.0 

@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from azure.storage.blob import BlobServiceClient, generate_blob_sas, BlobSasPermissions
 from datetime import datetime, timedelta, timezone
 
+
 load_dotenv()
 
 AZURE_STORAGE_CONNECTION_STRING = os.getenv("AZURE_SAK")
@@ -25,3 +26,15 @@ class ABlob:
             expiry=fecha_utc + timedelta(hours=1)
         )
         return sas_token
+    
+    def delete_blob(self, id: int):
+        try:
+            blob_name = f"poke_report_{id}.csv"
+            blob_client = self.container_client.get_blob_client(blob_name)
+            if blob_client.exists():
+                blob_client.delete_blob(delete_snapshots="include")
+                return True
+            else:
+                return False
+        except Exception as e:
+            raise
