@@ -1,4 +1,8 @@
 fastapi
 uvicorn
 python-dotenv
-
+pyodbc
+logging
+asyncio
+azure-storage-queue==12.11.0
+azure-storage-blob==12.22.0
